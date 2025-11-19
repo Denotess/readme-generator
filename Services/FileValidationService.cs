@@ -5,7 +5,8 @@ namespace ReadmeGen.Services
     {
         public async Task<bool> ValidateFiles(IFormFileCollection file, FileValidationDto dto)
         {
-            // List of allowed code file extensions
+            int maxSizeMb = 10;
+            long maxSizeBytes = maxSizeMb * 1024 * 1024;
             var allowedExtensions = new HashSet<string>
             {
                 ".cs", ".py", ".js", ".ts", ".java", ".cpp", ".c", ".rb", ".go", ".php", ".html", ".css", ".json", ".xml", ".md"
@@ -14,6 +15,10 @@ namespace ReadmeGen.Services
             bool allValid = true;
             foreach (var f in file)
             {
+                if (f.Length > maxSizeBytes){
+                    dto.ValidationStatus = Status.Failed;
+                    return false;
+                }
                 var ext = System.IO.Path.GetExtension(f.FileName).ToLowerInvariant();
                 if (!allowedExtensions.Contains(ext))
                 {
