@@ -12,7 +12,7 @@ namespace ReadmeGen.Services
                 ".cs", ".py", ".js", ".ts", ".java", ".cpp", ".c", ".rb", ".go", ".php", ".html", ".css", ".json", ".xml", ".md"
             };
 
-            bool allValid = true;
+            bool isValid = true;
             foreach (var f in file)
             {
                 if (f.Length > maxSizeBytes){
@@ -23,7 +23,6 @@ namespace ReadmeGen.Services
                 if (!allowedExtensions.Contains(ext))
                 {
                     dto.InvalidFiles.Add(f.FileName);
-                    allValid = false;
                 }
                 else{
                     dto.ValidFiles.Add(f.FileName);
@@ -32,6 +31,7 @@ namespace ReadmeGen.Services
             if (dto.ValidFiles.Count == 0)
             {
                 dto.ValidationStatus = Status.Failed;
+                isValid = false;
             }
             else if (dto.InvalidFiles.Count == 0){
                 dto.ValidationStatus = Status.Succes;
@@ -39,7 +39,7 @@ namespace ReadmeGen.Services
             else {
                 dto.ValidationStatus = Status.Partial;
             }
-            return allValid;
+            return isValid;
         }
         
     }
