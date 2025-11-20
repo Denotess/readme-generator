@@ -21,7 +21,7 @@ namespace ReadmeGen.Controllers
             {
                 return BadRequest(dto);
             }
-            return Ok();
+            return Ok(dto);
         }
     }
 }
