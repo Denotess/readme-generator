@@ -8,20 +8,27 @@ namespace ReadmeGen.Controllers
     public class UploadController : ControllerBase
     {
         private readonly IFileValidationService _fileValidationService;
-        public UploadController(IFileValidationService fileValidationService)
+        private readonly IFileSaveService _fileSaveService;
+        public UploadController(IFileValidationService fileValidationService, IFileSaveService fileSaveService)
         {
             _fileValidationService = fileValidationService;
+            _fileSaveService = fileSaveService;
         }
 
         [HttpPost("upload")]
-        public async Task<IActionResult> Generate(IFormFileCollection files, FileValidationDto dto)
+        public async Task<IActionResult> Generate([FromForm]IFormFileCollection files, FileValidationDto validationDto, FileSaveDto saveDto)
         {
-            bool isValid = await _fileValidationService.ValidateFiles(files, dto);
+            bool isValid = await _fileValidationService.ValidateFiles(files, validationDto);
             if (!isValid)
             {
-                return BadRequest(dto);
+                return BadRequest(validationDto);
             }
-            return Ok(dto);
+            await _fileSaveService.SaveFiles(files, saveDto);
+                if (saveDto.SaveStatus == SaveStatus.Failed)
+            {
+                return BadRequest(saveDto);
+            }
+            return Ok( new {validation = validationDto, save = saveDto});
         }
     }
 }
